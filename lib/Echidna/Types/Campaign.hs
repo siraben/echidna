@@ -116,6 +116,9 @@ initialWorkerState =
               , ncalls = 0
               }
 
+defaultTestLimit :: Int
+defaultTestLimit = 50000
+
 defaultSequenceLength :: Int
 defaultSequenceLength = 100
 

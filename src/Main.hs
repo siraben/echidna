@@ -240,6 +240,7 @@ data Options = Options
   , cliSeed             :: Maybe Int
   , cliCryticArgs       :: Maybe String
   , cliSolcArgs         :: Maybe String
+  , cliNoTestLimit      :: Bool
   }
 
 optsParser :: ParserInfo Options
@@ -275,7 +276,7 @@ options = Options
     <> help "Timeout given in seconds.")
   <*> optional (option auto $ long "test-limit"
     <> metavar "INTEGER"
-    <> help "Number of sequences of transactions to generate during testing. Default is unbounded.")
+    <> help ("Number of sequences of transactions to generate during testing. Default is " ++ show defaultTestLimit))
   <*> optional (option auto $ long "shrink-limit"
     <> metavar "INTEGER"
     <> help ("Number of tries to attempt to shrink a failing sequence of transactions. Default is " ++ show defaultShrinkLimit))
@@ -300,6 +301,7 @@ options = Options
   <*> optional (option str $ long "solc-args"
     <> metavar "ARGS"
     <> help "Additional arguments to use in solc for the compilation of the contract to test.")
+  <*> switch (long "no-test-limit" <> help "Whether to disable the test limit. Default is false.")
 
 versionOption :: Parser (a -> a)
 versionOption = infoOption
@@ -333,7 +335,7 @@ overrideConfig config Options{..} = do
 
     overrideCampaignConf campaignConf = campaignConf
       { corpusDir = cliCorpusDir <|> campaignConf.corpusDir
-      , testLimit = cliTestLimit <|> campaignConf.testLimit
+      , testLimit = if cliNoTestLimit then Nothing else cliTestLimit <|> campaignConf.testLimit
       , shrinkLimit = fromMaybe campaignConf.shrinkLimit cliShrinkLimit
       , seqLen = fromMaybe campaignConf.seqLen cliSeqLen
       , seed = cliSeed <|> campaignConf.seed

@@ -85,7 +85,7 @@ instance FromJSON EConfigWithUsage where
         pure $ TestConf classify (const psender)
 
       campaignConfParser = CampaignConf
-        <$> v ..:? "testLimit"
+        <$> v ..:? "testLimit" ..!= (v ..:? "noTestLimit" <&> \case Just False -> Nothing; _ -> Just defaultTestLimit)
         <*> v ..:? "stopOnFail" ..!= False
         <*> v ..:? "estimateGas" ..!= False
         <*> v ..:? "seqLen" ..!= defaultSequenceLength
